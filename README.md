@@ -64,3 +64,8 @@ This project demonstrates:
 ---
 
 Developed as an API Integration Project using Holiday API.
+
+### LINKS OF API USED
+
+Upcoming Holidays - https://calendarific.com/
+Holidays Explorer - https://holidayapi.com/
