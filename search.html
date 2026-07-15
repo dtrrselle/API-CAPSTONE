@@ -56,14 +56,14 @@
     .navbar {
       background: var(--color-primary);
       color: var(--color-white);
-      padding: 16px 24px;
+      padding: 14px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.10);
     }
 
     .navbar__brand {
@@ -71,38 +71,46 @@
       align-items: center;
       gap: 10px;
       font-weight: 700;
-      font-size: 1.25rem;
-      letter-spacing: 0.3px;
+      font-size: 1.2rem;
+      letter-spacing: 0.2px;
     }
 
     .navbar__brand-icon {
-      width: 32px;
-      height: 32px;
-      background: var(--color-accent);
+      width: 34px;
+      height: 34px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1.5px solid rgba(255, 213, 79, 0.55);
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1rem;
-      color: var(--color-primary);
     }
 
     .navbar__links {
       display: flex;
-      gap: 24px;
+      align-items: center;
+      gap: 6px;
       font-weight: 500;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
 
     .navbar__links a {
-      padding: 6px 4px;
-      border-bottom: 2px solid transparent;
-      transition: border-color var(--transition), color var(--transition);
+      padding: 8px 16px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.85);
+      transition: background var(--transition), color var(--transition);
     }
 
-    .navbar__links a.active,
     .navbar__links a:hover {
-      border-bottom-color: var(--color-accent);
+      background: rgba(255, 255, 255, 0.10);
+      color: var(--color-white);
+    }
+
+    .navbar__links a.active {
+      background: var(--color-accent);
+      color: var(--color-primary);
+      font-weight: 600;
     }
 
     .navbar__toggle {
@@ -119,16 +127,32 @@
     ========================================================= */
     .page-header {
       max-width: 900px;
-      margin: 40px auto 0;
+      margin: 44px auto 0;
       padding: 0 20px;
       text-align: center;
     }
 
+    .page-header .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--color-secondary);
+      background: rgba(76, 175, 80, 0.10);
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
     .page-header h1 {
-      font-size: 2.1rem;
+      font-size: 2.2rem;
       font-weight: 700;
       color: var(--color-primary);
-      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+      margin: 0 0 8px;
     }
 
     .page-header p {
@@ -148,32 +172,30 @@
 
     .search-card {
       background: var(--color-white);
+      border: 1px solid #e9edf1;
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-soft);
-      padding: 28px;
+      padding: 30px 32px;
       position: relative;
       overflow: hidden;
     }
 
-    /* little "calendar tab" decoration along the top of the search card */
+    /* Clean single-tone accent along the top of the search card —
+       a quiet nod to a calendar's top edge, without looking busy. */
     .search-card::before {
       content: "";
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      height: 6px;
-      background: repeating-linear-gradient(
-        90deg,
-        var(--color-primary) 0 24px,
-        var(--color-secondary) 24px 48px
-      );
+      height: 4px;
+      background: var(--color-primary);
     }
 
     #searchForm {
       display: grid;
       grid-template-columns: 1.4fr 1fr auto;
-      gap: 18px;
+      gap: 20px;
       align-items: end;
     }
 
@@ -184,9 +206,11 @@
     }
 
     .form-group label {
-      font-size: 0.85rem;
+      font-size: 0.78rem;
       font-weight: 600;
-      color: var(--color-primary);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: #7c8894;
     }
 
     .form-group select,
@@ -194,18 +218,23 @@
       font-family: 'Poppins', sans-serif;
       font-size: 0.95rem;
       padding: 12px 14px;
-      border: 1.5px solid #dfe6ea;
+      border: 1.5px solid #dde3e8;
       border-radius: var(--radius-sm);
-      background: var(--color-bg);
+      background: var(--color-white);
       color: var(--color-text);
       transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .form-group select:hover,
+    .form-group input[type="number"]:hover {
+      border-color: #c7d0d6;
     }
 
     .form-group select:focus,
     .form-group input[type="number"]:focus {
       outline: none;
       border-color: var(--color-secondary);
-      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.18);
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
     }
 
     /* Primary button style — reused for all "action" buttons site-wide */
@@ -213,12 +242,14 @@
       background: var(--color-primary);
       color: var(--color-white);
       border: none;
-      padding: 12px 26px;
+      padding: 12px 28px;
       font-family: 'Poppins', sans-serif;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
+      letter-spacing: 0.2px;
       border-radius: var(--radius-sm);
       cursor: pointer;
+      box-shadow: 0 2px 8px rgba(46, 139, 87, 0.20);
       transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
       white-space: nowrap;
     }
@@ -309,23 +340,26 @@
 
     .holiday-card {
       background: var(--color-white);
+      border: 1px solid #edf1f4;
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-soft);
       overflow: hidden;
       display: flex;
-      transition: transform var(--transition), box-shadow var(--transition);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
     }
 
     .holiday-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       box-shadow: var(--shadow-hover);
+      border-color: #dcebe1;
     }
 
     /* Calendar-style date badge on the left of each card */
     .holiday-card__date {
-      background: var(--color-primary);
-      color: var(--color-white);
-      min-width: 74px;
+      background: #f0f7f3;
+      color: var(--color-primary);
+      border-right: 1px solid #e3ede6;
+      min-width: 72px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -334,40 +368,42 @@
     }
 
     .holiday-card__date .month {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
-      opacity: 0.9;
+      opacity: 0.8;
     }
 
     .holiday-card__date .day {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: 700;
-      line-height: 1.1;
+      line-height: 1.2;
     }
 
     .holiday-card__body {
-      padding: 16px 18px;
+      padding: 14px 18px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 7px;
       justify-content: center;
     }
 
     .holiday-card__name {
       font-weight: 600;
-      font-size: 1.02rem;
+      font-size: 1rem;
       color: var(--color-text);
+      line-height: 1.35;
     }
 
     .holiday-card__country {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.8rem;
+      font-size: 0.76rem;
       font-weight: 600;
-      color: var(--color-primary);
-      background: rgba(46, 139, 87, 0.08);
+      color: var(--color-secondary);
+      background: rgba(76, 175, 80, 0.10);
       padding: 3px 10px;
       border-radius: 999px;
       width: fit-content;
@@ -423,14 +459,18 @@
       .navbar__links {
         display: none;
         flex-direction: column;
+        align-items: stretch;
         position: absolute;
-        top: 64px;
+        top: 60px;
         left: 0;
         right: 0;
         background: var(--color-primary);
-        padding: 16px 24px;
-        gap: 14px;
+        padding: 12px 20px 18px;
+        gap: 6px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.12);
       }
+
+      .navbar__links a { text-align: center; }
 
       .navbar__links.open { display: flex; }
 
@@ -466,8 +506,7 @@
     <nav class="navbar__links" id="navLinks">
       <a href="index.html">Home</a>
       <a href="search.html" class="active">Search Holidays</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
+      <a href="upcoming.html">Upcoming Holidays</a>
     </nav>
   </header>
 
@@ -475,6 +514,7 @@
        PAGE HEADER
   ========================================================== -->
   <section class="page-header">
+    <span class="eyebrow">📅 Holiday Lookup</span>
     <h1>Search Holidays</h1>
     <p>Pick a country and a year to discover its official holidays.</p>
   </section>
@@ -553,8 +593,7 @@
       <div class="footer__links">
         <a href="index.html">Home</a>
         <a href="search.html">Search Holidays</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
+        <a href="upcoming.html">Upcoming Holidays</a>
       </div>
       <div class="footer__copy">&copy; 2026 Holiday Explorer. All rights reserved.</div>
     </div>
