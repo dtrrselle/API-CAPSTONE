@@ -24,7 +24,7 @@ Holiday Explorer is an API-powered web application that allows users to discover
 
 | Name | Branch | Responsibility |
 |--------|--------|--------|
-| **Evina R. Suanes** | `feature/search` | Holiday Search Page |
+| **Evina R. Suanes** | `feature/search` | Holiday Search Page Explorer |
 | **Ronian U. Hayag** | `feature/homepage` | Homepage Development |
 | **Janelle Mae V. de Torres** | `feature/upcoming-holidays` | Upcoming Holidays Page |
 
