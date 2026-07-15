@@ -1,13 +1,13 @@
 /* ==================================================================
    HOLIDAY EXPLORER - Upcoming Holidays Page Logic
-   Uses the Calendarific Holiday API via Fetch + async/await.
+   Uses the holidayapi.com Holiday API via Fetch + async/await.
    ================================================================== */
 
 // Store the API key in a variable (as required by the brief)
 const API_KEY = "c118c735-5223-467c-866a-48f8c0a0e911";
 
-// Base endpoint for the Calendarific Holiday API
-const API_BASE_URL = "https://calendarific.com/api/v2/holidays";
+// Base endpoint for the holidayapi.com Holiday API
+const API_BASE_URL = "https://holidayapi.com/v1/holidays";
 
 // Map of country codes to readable country names (used for display)
 const COUNTRY_NAMES = {
@@ -39,31 +39,23 @@ function resetStatusBoxes() {
 }
 
 /**
- * Fetches holidays for a given country + year from the Calendarific API.
+ * Fetches holidays for a given country + year from the holidayapi.com API.
  * Returns the array of holiday objects, or throws on failure.
  */
 async function fetchHolidays(countryCode, year) {
-  const url = `${API_BASE_URL}?api_key=${API_KEY}&country=${countryCode}&year=${year}`;
+  const url = `${API_BASE_URL}?key=${API_KEY}&country=${countryCode}&year=${year}`;
 
   const response = await fetch(url);
-
-  // Calendarific returns HTTP 200 even for some errors, so we also
-  // check the response.ok flag as a first line of defense.
-  if (!response.ok) {
-    throw new Error(`Network error (status ${response.status})`);
-  }
-
   const data = await response.json();
 
-  // The API wraps errors inside meta.code instead of the HTTP status
-  const metaCode = data && data.meta && data.meta.code;
-  if (metaCode !== 200) {
-    const apiMessage =
-      (data.meta && data.meta.error_type) || "Unable to retrieve holidays.";
+  // holidayapi.com reports errors via response.ok being false AND/OR
+  // a non-200 "status" field in the JSON body, along with an "error" message.
+  if (!response.ok || data.status !== 200) {
+    const apiMessage = data.error || `Unable to retrieve holidays (status ${response.status}).`;
     throw new Error(apiMessage);
   }
 
-  const holidays = data.response && data.response.holidays;
+  const holidays = data.holidays;
   if (!Array.isArray(holidays)) {
     throw new Error("Unexpected response format from the holiday API.");
   }
@@ -78,7 +70,7 @@ async function fetchHolidays(countryCode, year) {
 function normalizeHoliday(holiday, countryCode) {
   return {
     name: holiday.name,
-    date: new Date(holiday.date.iso),
+    date: new Date(holiday.date), // holidayapi.com returns date as "YYYY-MM-DD"
     country: COUNTRY_NAMES[countryCode] || countryCode,
   };
 }
