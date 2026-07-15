@@ -1,15 +1,15 @@
 /* ==================================================================
    HOLIDAY EXPLORER - Upcoming Holidays Page Logic
-   Uses the holidayapi.com Holiday API via Fetch + async/await.
+   Uses the Calendarific Holiday API via Fetch + async/await.
    ================================================================== */
 
-// Store the API key in a variable (as required by the brief)
-const API_KEY = "c118c735-5223-467c-866a-48f8c0a0e911";
+// Store the API key in a variable
+const API_KEY = "XbTBRS861tYOs5Cze6VraZI62wfbo2zD";
 
-// Base endpoint for the holidayapi.com Holiday API
-const API_BASE_URL = "https://holidayapi.com/v1/holidays";
+// Base endpoint for the Calendarific API
+const API_BASE_URL = "https://calendarific.com/api/v2/holidays";
 
-// Map of country codes to readable country names (used for display)
+// Map of country codes to readable country names
 const COUNTRY_NAMES = {
   PH: "Philippines",
   US: "United States",
@@ -18,7 +18,7 @@ const COUNTRY_NAMES = {
   CA: "Canada",
 };
 
-// Grab references to the DOM elements we need to update
+// Grab references to the DOM elements
 const countrySelect = document.getElementById("countrySelect");
 const showHolidaysBtn = document.getElementById("showHolidaysBtn");
 const loadingBox = document.getElementById("loadingBox");
@@ -27,10 +27,6 @@ const errorText = document.getElementById("errorText");
 const emptyBox = document.getElementById("emptyBox");
 const holidayGrid = document.getElementById("holidayGrid");
 
-/**
- * Hides every status box (loading / error / empty) and clears the grid.
- * Called at the start of every fetch so states don't overlap.
- */
 function resetStatusBoxes() {
   loadingBox.classList.remove("visible");
   errorBox.classList.remove("visible");
@@ -38,60 +34,62 @@ function resetStatusBoxes() {
   holidayGrid.innerHTML = "";
 }
 
-/**
- * Fetches holidays for a given country + year from the holidayapi.com API.
- * Returns the array of holiday objects, or throws on failure.
- */
 async function fetchHolidays(countryCode, year) {
-  const url = `${API_BASE_URL}?key=${API_KEY}&country=${countryCode}&year=${year}`;
+  const url =
+    `${API_BASE_URL}?api_key=${API_KEY}&country=${countryCode}&year=${year}`;
 
   const response = await fetch(url);
   const data = await response.json();
 
-  // holidayapi.com reports errors via response.ok being false AND/OR
-  // a non-200 "status" field in the JSON body, along with an "error" message.
-  if (!response.ok || data.status !== 200) {
-    const apiMessage = data.error || `Unable to retrieve holidays (status ${response.status}).`;
-    throw new Error(apiMessage);
+  if (!response.ok) {
+    throw new Error(
+      `Unable to retrieve holidays (${response.status})`
+    );
   }
 
-  const holidays = data.holidays;
-  if (!Array.isArray(holidays)) {
-    throw new Error("Unexpected response format from the holiday API.");
+  if (
+    !data.response ||
+    !Array.isArray(data.response.holidays)
+  ) {
+    throw new Error(
+      "Unexpected response format from Calendarific."
+    );
   }
 
-  return holidays;
+  return data.response.holidays;
 }
 
-/**
- * Converts a raw holiday object from the API into a simplified shape
- * that's easier to render: { name, date (Date object), country }.
- */
 function normalizeHoliday(holiday, countryCode) {
   return {
     name: holiday.name,
-    date: new Date(holiday.date), // holidayapi.com returns date as "YYYY-MM-DD"
+
+    // Calendarific format:
+    // holiday.date.iso
+    date: new Date(holiday.date.iso),
+
     country: COUNTRY_NAMES[countryCode] || countryCode,
   };
 }
 
-/**
- * Builds a single holiday card element (calendar-tile style).
- */
 function createHolidayCard(holiday) {
   const card = document.createElement("article");
   card.className = "holiday-card";
 
   const day = holiday.date.getDate();
-  const month = holiday.date.toLocaleString("en-US", { month: "short" });
+  const month = holiday.date.toLocaleString("en-US", {
+    month: "short",
+  });
   const year = holiday.date.getFullYear();
-  const weekday = holiday.date.toLocaleString("en-US", { weekday: "long" });
+  const weekday = holiday.date.toLocaleString("en-US", {
+    weekday: "long",
+  });
 
   card.innerHTML = `
     <div class="holiday-card__date">
       <span class="holiday-card__day">${day}</span>
       <span class="holiday-card__month-year">${month} ${year}</span>
     </div>
+
     <div class="holiday-card__body">
       <h3 class="holiday-card__name">${holiday.name}</h3>
       <span class="holiday-card__weekday">${weekday}</span>
@@ -102,47 +100,45 @@ function createHolidayCard(holiday) {
   return card;
 }
 
-/**
- * Renders a list of normalized holidays into the grid.
- */
 function renderHolidays(holidays) {
   holidayGrid.innerHTML = "";
+
   holidays.forEach((holiday) => {
     holidayGrid.appendChild(createHolidayCard(holiday));
   });
 }
 
-/**
- * Main handler: runs when the "Show Upcoming Holidays" button is clicked.
- */
 async function handleShowHolidays() {
   const countryCode = countrySelect.value;
+
   const today = new Date();
-  // Zero out the time portion so "today" itself still counts as upcoming
   today.setHours(0, 0, 0, 0);
 
   resetStatusBoxes();
+
   loadingBox.classList.add("visible");
   showHolidaysBtn.disabled = true;
 
   try {
     const currentYear = today.getFullYear();
 
-    // Fetch the current year, and also next year in case there are
-    // no more holidays left in the current year (e.g. asking in December).
-    const [thisYearHolidays, nextYearHolidays] = await Promise.all([
-      fetchHolidays(countryCode, currentYear),
-      fetchHolidays(countryCode, currentYear + 1),
-    ]);
+    const [thisYearHolidays, nextYearHolidays] =
+      await Promise.all([
+        fetchHolidays(countryCode, currentYear),
+        fetchHolidays(countryCode, currentYear + 1),
+      ]);
 
-    const combined = [...thisYearHolidays, ...nextYearHolidays].map((h) =>
-      normalizeHoliday(h, countryCode)
+    const combined = [
+      ...thisYearHolidays,
+      ...nextYearHolidays,
+    ].map((holiday) =>
+      normalizeHoliday(holiday, countryCode)
     );
 
-    // Keep only holidays that are today or in the future
-    const upcoming = combined.filter((holiday) => holiday.date >= today);
+    const upcoming = combined.filter(
+      (holiday) => holiday.date >= today
+    );
 
-    // Sort by nearest date first
     upcoming.sort((a, b) => a.date - b.date);
 
     loadingBox.classList.remove("visible");
@@ -154,18 +150,27 @@ async function handleShowHolidays() {
     }
 
     renderHolidays(upcoming);
+
   } catch (error) {
-    // Error handling: show a friendly message in the error box
     loadingBox.classList.remove("visible");
     showHolidaysBtn.disabled = false;
+
     errorText.textContent =
-      "We couldn't load holidays right now. " + error.message;
+      "We couldn't load holidays right now. " +
+      error.message;
+
     errorBox.classList.add("visible");
+
+    console.error(error);
   }
 }
 
-// Wire up the button click
-showHolidaysBtn.addEventListener("click", handleShowHolidays);
+showHolidaysBtn.addEventListener(
+  "click",
+  handleShowHolidays
+);
 
-// Automatically load holidays for the default selected country on page load
-window.addEventListener("DOMContentLoaded", handleShowHolidays);
+window.addEventListener(
+  "DOMContentLoaded",
+  handleShowHolidays
+);
