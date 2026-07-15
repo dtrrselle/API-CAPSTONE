@@ -1,3 +1,3 @@
-# 🎵 MusicMatch
+# 🌎 Holiday Explorer
 
-MusicMatch is a simple web application developed as an API integration project. The website helps users discover new music artists and movie recommendations using the TasteDive API. By entering a favorite artist or movie, users can receive similar recommendations through real-time data retrieval. This project demonstrates the use of HTML, CSS, JavaScript, Fetch API, API authentication, error handling, responsive design, and GitHub collaboration.
+Holiday Explorer is an API-powered web application that helps users explore public holidays from different countries using the Holiday API. The project demonstrates API key authentication, data retrieval, responsive design, and JavaScript-based API integration.
