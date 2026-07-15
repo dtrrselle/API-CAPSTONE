@@ -96,6 +96,14 @@ function showEmptyState() {
 // RENDERING
 // -------------------------------------------------------------
 
+// Small inline SVG icon used on each card next to the country name.
+// Kept as a plain string so it can be reused inside the template
+// literal below without emoji characters.
+const COUNTRY_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12">
+  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+  <circle cx="12" cy="10" r="3"></circle>
+</svg>`;
+
 /**
  * Builds and inserts a holiday card for each holiday returned
  * by the API.
@@ -118,7 +126,7 @@ function renderHolidays(holidays) {
         </div>
         <div class="holiday-card__body">
           <span class="holiday-card__name">${escapeHtml(holiday.name)}</span>
-          <span class="holiday-card__country">🌐 ${escapeHtml(countryLabel)}</span>
+          <span class="holiday-card__country">${COUNTRY_ICON_SVG} ${escapeHtml(countryLabel)}</span>
         </div>
       </article>
     `;
