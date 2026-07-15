@@ -35,7 +35,26 @@ const COUNTRY_NAMES = {
   US: "United States",
   JP: "Japan",
   AU: "Australia",
-  CA: "Canada"
+  CA: "Canada",
+  GB: "United Kingdom",
+  SG: "Singapore",
+  MY: "Malaysia",
+  ID: "Indonesia",
+  TH: "Thailand",
+  VN: "Vietnam",
+  KR: "South Korea",
+  CN: "China",
+  IN: "India",
+  DE: "Germany",
+  FR: "France",
+  IT: "Italy",
+  ES: "Spain",
+  NL: "Netherlands",
+  NZ: "New Zealand",
+  BR: "Brazil",
+  MX: "Mexico",
+  ZA: "South Africa",
+  AE: "United Arab Emirates"
 };
 
 // Short month names used for the little calendar-style date badge
