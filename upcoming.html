@@ -86,12 +86,26 @@
       font-size: 0.95rem;
       padding: 6px 4px;
       border-bottom: 2px solid transparent;
-      transition: border-color 0.2s ease, opacity 0.2s ease;
+      transition: border-color 0.2s ease, opacity 0.2s ease, background-color 0.2s ease;
     }
 
-    .navbar__links a:hover,
-    .navbar__links a.active {
+    .navbar__links a:hover {
       border-bottom: 2px solid var(--color-accent);
+    }
+
+    /* Active link styled as a highlighted pill button (matches reference design) */
+    .navbar__links a.active {
+      background-color: var(--color-accent);
+      color: var(--color-text);
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 999px;
+      border-bottom: 2px solid transparent;
+    }
+
+    .navbar__links a.active:hover {
+      border-bottom: 2px solid transparent;
+      opacity: 0.9;
     }
 
     /* Mobile nav toggle (simple checkbox hack, no JS needed for menu) */
@@ -450,8 +464,8 @@
     <button class="navbar__toggle" id="navToggle" aria-label="Toggle menu">☰</button>
     <ul class="navbar__links" id="navLinks">
       <li><a href="index.html">Home</a></li>
-      <li><a href="upcoming.html" class="active">Upcoming Holidays</a></li>
-      <li><a href="about.html">About</a></li>
+      <li><a href="search.html" class="active">Search Holidays</a></li>
+      <li><a href="upcoming.html">Upcoming Holidays</a></li>
     </ul>
   </nav>
 
