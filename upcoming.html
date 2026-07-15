@@ -72,7 +72,17 @@
     }
 
     .navbar__brand-icon {
-      font-size: 1.5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      color: var(--color-accent);
+    }
+
+    .navbar__brand-icon svg {
+      width: 100%;
+      height: 100%;
     }
 
     .navbar__links {
@@ -86,12 +96,26 @@
       font-size: 0.95rem;
       padding: 6px 4px;
       border-bottom: 2px solid transparent;
-      transition: border-color 0.2s ease, opacity 0.2s ease;
+      transition: border-color 0.2s ease, opacity 0.2s ease, background-color 0.2s ease;
     }
 
-    .navbar__links a:hover,
-    .navbar__links a.active {
+    .navbar__links a:hover {
       border-bottom: 2px solid var(--color-accent);
+    }
+
+    /* Active link styled as a highlighted pill button (matches reference design) */
+    .navbar__links a.active {
+      background-color: var(--color-accent);
+      color: var(--color-text);
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 999px;
+      border-bottom: 2px solid transparent;
+    }
+
+    .navbar__links a.active:hover {
+      border-bottom: 2px solid transparent;
+      opacity: 0.9;
     }
 
     /* Mobile nav toggle (simple checkbox hack, no JS needed for menu) */
@@ -444,14 +468,21 @@
   ============================================ -->
   <nav class="navbar">
     <a href="index.html" class="navbar__brand">
-      <span class="navbar__brand-icon">🗓️</span>
+      <span class="navbar__brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+          <line x1="16" y1="3" x2="16" y2="7"></line>
+          <line x1="8" y1="3" x2="8" y2="7"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </span>
       Holiday Explorer
     </a>
     <button class="navbar__toggle" id="navToggle" aria-label="Toggle menu">☰</button>
     <ul class="navbar__links" id="navLinks">
       <li><a href="index.html">Home</a></li>
+      <li><a href="search.html">Search Holidays</a></li>
       <li><a href="upcoming.html" class="active">Upcoming Holidays</a></li>
-      <li><a href="about.html">About</a></li>
     </ul>
   </nav>
 
