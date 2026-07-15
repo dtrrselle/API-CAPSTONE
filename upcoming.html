@@ -72,15 +72,17 @@
     }
 
     .navbar__brand-icon {
-      font-size: 1.3rem;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 34px;
-      height: 34px;
-      border: 2px solid rgba(255, 255, 255, 0.5);
-      border-radius: 9px;
-      background-color: rgba(255, 255, 255, 0.08);
+      width: 24px;
+      height: 24px;
+      color: var(--color-accent);
+    }
+
+    .navbar__brand-icon svg {
+      width: 100%;
+      height: 100%;
     }
 
     .navbar__links {
@@ -466,7 +468,14 @@
   ============================================ -->
   <nav class="navbar">
     <a href="index.html" class="navbar__brand">
-      <span class="navbar__brand-icon">🗓️</span>
+      <span class="navbar__brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+          <line x1="16" y1="3" x2="16" y2="7"></line>
+          <line x1="8" y1="3" x2="8" y2="7"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </span>
       Holiday Explorer
     </a>
     <button class="navbar__toggle" id="navToggle" aria-label="Toggle menu">☰</button>
