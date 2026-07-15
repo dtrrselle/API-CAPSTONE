@@ -1,0 +1,3 @@
+# 🎵 MusicMatch
+
+MusicMatch is a simple web application developed as an API integration project. The website helps users discover new music artists and movie recommendations using the TasteDive API. By entering a favorite artist or movie, users can receive similar recommendations through real-time data retrieval. This project demonstrates the use of HTML, CSS, JavaScript, Fetch API, API authentication, error handling, responsive design, and GitHub collaboration.
