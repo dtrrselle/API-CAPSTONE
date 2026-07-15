@@ -16,6 +16,23 @@ const COUNTRY_NAMES = {
   JP: "Japan",
   AU: "Australia",
   CA: "Canada",
+  GB: "United Kingdom",
+  SG: "Singapore",
+  MY: "Malaysia",
+  ID: "Indonesia",
+  TH: "Thailand",
+  VN: "Vietnam",
+  KR: "South Korea",
+  CN: "China",
+  IN: "India",
+  DE: "Germany",
+  FR: "France",
+  IT: "Italy",
+  ES: "Spain",
+  MX: "Mexico",
+  BR: "Brazil",
+  NZ: "New Zealand",
+  AE: "United Arab Emirates",
 };
 
 // Grab references to the DOM elements
