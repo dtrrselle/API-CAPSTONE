@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upcoming Holidays | Holiday Explorer</title>
+
+  <!-- Google Font: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================
+       HOLIDAY EXPLORER - SHARED DESIGN TOKENS
+       These variables keep every page on the site
+       (navbar, footer, buttons, colors) consistent.
+    ============================================ */
+    :root {
+      --color-primary: #2E8B57;   /* deep green - navbar / headings */
+      --color-secondary: #4CAF50; /* lighter green - buttons / links */
+      --color-accent: #FFD54F;    /* warm yellow - highlights / dates */
+      --color-bg: #F5F7FA;        /* page background */
+      --color-text: #333333;      /* body text */
+      --color-white: #ffffff;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-soft: 0 4px 14px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 10px 24px rgba(0, 0, 0, 0.14);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ============================================
+       NAVBAR (shared across all Holiday Explorer pages)
+    ============================================ */
+    .navbar {
+      background-color: var(--color-primary);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .navbar__brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--color-white);
+    }
+
+    .navbar__brand-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      color: var(--color-accent);
+    }
+
+    .navbar__brand-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .navbar__links {
+      display: flex;
+      gap: 28px;
+    }
+
+    .navbar__links a {
+      color: var(--color-white);
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 6px 4px;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.2s ease, opacity 0.2s ease, background-color 0.2s ease;
+    }
+
+    .navbar__links a:hover {
+      border-bottom: 2px solid var(--color-accent);
+    }
+
+    /* Active link styled as a highlighted pill button (matches reference design) */
+    .navbar__links a.active {
+      background-color: var(--color-accent);
+      color: var(--color-text);
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 999px;
+      border-bottom: 2px solid transparent;
+    }
+
+    .navbar__links a.active:hover {
+      border-bottom: 2px solid transparent;
+      opacity: 0.9;
+    }
+
+    /* Mobile nav toggle (simple checkbox hack, no JS needed for menu) */
+    .navbar__toggle {
+      display: none;
+      color: var(--color-white);
+      font-size: 1.5rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    /* ============================================
+       PAGE HEADER / HERO
+    ============================================ */
+    .page-header {
+      text-align: center;
+      padding: 48px 20px 32px;
+    }
+
+    .page-header__eyebrow {
+      display: inline-block;
+      background-color: var(--color-accent);
+      color: var(--color-text);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+      letter-spacing: 0.03em;
+    }
+
+    .page-header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: 10px;
+    }
+
+    .page-header p {
+      color: #666;
+      max-width: 520px;
+      margin: 0 auto;
+      font-size: 0.98rem;
+    }
+
+    /* ============================================
+       MAIN CONTENT WRAPPER
+    ============================================ */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+
+    /* ============================================
+       CONTROL PANEL (country select + button)
+       Styled like a calendar toolbar strip
+    ============================================ */
+    .control-panel {
+      background-color: var(--color-white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 18px;
+      margin-bottom: 36px;
+      border-top: 6px solid var(--color-primary);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .control-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .control-group select {
+      font-family: 'Poppins', sans-serif;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid #dfe3e8;
+      background-color: var(--color-bg);
+      font-size: 0.95rem;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+
+    .control-group select:focus {
+      outline: none;
+      border-color: var(--color-secondary);
+    }
+
+    /* Shared button style used across the site */
+    .btn-primary {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--color-secondary);
+      color: var(--color-white);
+      border: none;
+      padding: 13px 26px;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      transition: background-color 0.2s ease, transform 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      background-color: #a9d3ae;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ============================================
+       STATUS AREA: loading / error / empty states
+    ============================================ */
+    .status-box {
+      text-align: center;
+      padding: 50px 20px;
+      background-color: var(--color-white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      display: none; /* shown dynamically by JS */
+    }
+
+    .status-box.visible {
+      display: block;
+    }
+
+    /* Spinner - styled like a rotating calendar ring */
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 5px solid #e0e0e0;
+      border-top: 5px solid var(--color-secondary);
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .status-box p {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .status-box.error p {
+      color: #C62828;
+      font-weight: 500;
+    }
+
+    .status-icon {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    /* ============================================
+       HOLIDAY CARDS GRID
+    ============================================ */
+    .holiday-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 22px;
+    }
+
+    /* Each card mimics a calendar day tile */
+    .holiday-card {
+      background-color: var(--color-white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .holiday-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .holiday-card__date {
+      background-color: var(--color-primary);
+      color: var(--color-white);
+      padding: 16px 20px;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .holiday-card__day {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .holiday-card__month-year {
+      font-size: 0.85rem;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    .holiday-card__body {
+      padding: 18px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .holiday-card__name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .holiday-card__weekday {
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    .holiday-card__country {
+      align-self: flex-start;
+      background-color: var(--color-accent);
+      color: var(--color-text);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-top: auto;
+    }
+
+    /* ============================================
+       FOOTER (shared across all Holiday Explorer pages)
+    ============================================ */
+    .footer {
+      background-color: var(--color-primary);
+      color: var(--color-white);
+      padding: 28px 24px;
+      text-align: center;
+      margin-top: auto;
+    }
+
+    .footer__links {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .footer__links a {
+      font-size: 0.88rem;
+      opacity: 0.9;
+      transition: opacity 0.2s ease;
+    }
+
+    .footer__links a:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
+    .footer__copy {
+      font-size: 0.8rem;
+      opacity: 0.75;
+    }
+
+    /* ============================================
+       RESPONSIVE DESIGN
+    ============================================ */
+    @media (max-width: 768px) {
+      .navbar__links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: var(--color-primary);
+        flex-direction: column;
+        gap: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .navbar__links.open {
+        max-height: 260px;
+      }
+
+      .navbar__links a {
+        padding: 14px 24px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+      }
+
+      .navbar__toggle {
+        display: block;
+      }
+
+      .page-header h1 {
+        font-size: 1.7rem;
+      }
+
+      .control-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .holiday-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================
+       NAVBAR
+  ============================================ -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar__brand">
+      <span class="navbar__brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+          <line x1="16" y1="3" x2="16" y2="7"></line>
+          <line x1="8" y1="3" x2="8" y2="7"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </span>
+      Holiday Explorer
+    </a>
+    <button class="navbar__toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+    <ul class="navbar__links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="search.html">Search Holidays</a></li>
+      <li><a href="upcoming.html" class="active">Upcoming Holidays</a></li>
+    </ul>
+  </nav>
+
+  <!-- ============================================
+       PAGE HEADER
+  ============================================ -->
+  <header class="page-header">
+    <span class="page-header__eyebrow">Plan ahead</span>
+    <h1>Upcoming Holidays</h1>
+    <p>Pick a country and see its nearest holidays, sorted from soonest to latest.</p>
+  </header>
+
+  <!-- ============================================
+       MAIN CONTENT
+  ============================================ -->
+  <main>
+
+    <!-- Control panel: country selector + action button -->
+    <section class="control-panel">
+      <div class="control-group">
+        <label for="countrySelect">Country</label>
+        <select id="countrySelect">
+          <option value="PH">Philippines</option>
+          <option value="US">United States</option>
+          <option value="JP">Japan</option>
+          <option value="AU">Australia</option>
+          <option value="CA">Canada</option>
+          <option value="GB">United Kingdom</option>
+          <option value="SG">Singapore</option>
+          <option value="MY">Malaysia</option>
+          <option value="ID">Indonesia</option>
+          <option value="TH">Thailand</option>
+          <option value="VN">Vietnam</option>
+          <option value="KR">South Korea</option>
+          <option value="CN">China</option>
+          <option value="IN">India</option>
+          <option value="DE">Germany</option>
+          <option value="FR">France</option>
+          <option value="IT">Italy</option>
+          <option value="ES">Spain</option>
+          <option value="MX">Mexico</option>
+          <option value="BR">Brazil</option>
+          <option value="NZ">New Zealand</option>
+          <option value="AE">United Arab Emirates</option>
+        </select>
+      </div>
+      <button class="btn-primary" id="showHolidaysBtn">Show Upcoming Holidays</button>
+    </section>
+
+    <!-- Loading indicator (hidden by default, shown via JS) -->
+    <div class="status-box" id="loadingBox">
+      <div class="spinner"></div>
+      <p>Fetching holidays...</p>
+    </div>
+
+    <!-- Error message (hidden by default, shown via JS on fetch failure) -->
+    <div class="status-box error" id="errorBox">
+      <span class="status-icon">⚠️</span>
+      <p id="errorText">Something went wrong while fetching holidays.</p>
+    </div>
+
+    <!-- Empty state (hidden by default, shown via JS when no holidays found) -->
+    <div class="status-box" id="emptyBox">
+      <span class="status-icon">📭</span>
+      <p>No upcoming holidays found for this country.</p>
+    </div>
+
+    <!-- Holiday cards render here -->
+    <section class="holiday-grid" id="holidayGrid"></section>
+
+  </main>
+
+  <!-- ============================================
+       FOOTER
+  ============================================ -->
+  <footer class="footer">
+    <div class="footer__links">
+      <a href="index.html">Home</a>
+      <a href="upcoming.html">Upcoming Holidays</a>
+      <a href="about.html">About</a>
+    </div>
+    <p class="footer__copy">&copy; 2026 Holiday Explorer. All rights reserved.</p>
+  </footer>
+
+  <!-- Mobile nav toggle script -->
+  <script>
+    document.getElementById('navToggle').addEventListener('click', function () {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+  </script>
+
+  <!-- Main page logic -->
+  <script src="upcoming.js"></script>
+</body>
+</html>
