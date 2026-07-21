@@ -24,6 +24,8 @@ const loadingBox = document.getElementById("loadingBox");
 const errorBox   = document.getElementById("errorBox");
 const emptyBox   = document.getElementById("emptyBox");
 const holidayGrid = document.getElementById("holidayGrid");
+const searchHistoryList = document.getElementById("searchHistoryList");
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 
 const navToggle = document.getElementById("navToggle");
 const navLinks  = document.getElementById("navLinks");
@@ -63,12 +65,80 @@ const MONTHS = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
+const SEARCH_HISTORY_KEY = "holidayExplorerSearchHistory";
+const MAX_SEARCH_HISTORY_ITEMS = 5;
+
 // -------------------------------------------------------------
 // MOBILE NAVBAR TOGGLE
 // -------------------------------------------------------------
 navToggle.addEventListener("click", () => {
   navLinks.classList.toggle("open");
 });
+
+// -------------------------------------------------------------
+// SEARCH HISTORY HELPERS
+// -------------------------------------------------------------
+
+function getSearchHistory() {
+  try {
+    const storedValue = localStorage.getItem(SEARCH_HISTORY_KEY);
+    return storedValue ? JSON.parse(storedValue) : [];
+  } catch (error) {
+    console.warn("Unable to read search history:", error);
+    return [];
+  }
+}
+
+function saveSearchHistory(history) {
+  try {
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
+  } catch (error) {
+    console.warn("Unable to save search history:", error);
+  }
+}
+
+function formatHistoryLabel(entry) {
+  const countryLabel = COUNTRY_NAMES[entry.country] || entry.country;
+  return `${countryLabel} · ${entry.year}`;
+}
+
+function renderSearchHistory() {
+  const history = getSearchHistory();
+
+  if (history.length === 0) {
+    searchHistoryList.innerHTML = '<p class="search-history__empty" id="searchHistoryEmpty">No recent searches yet.</p>';
+    return;
+  }
+
+  searchHistoryList.innerHTML = history.map((entry) => {
+    return `
+      <button type="button" class="search-history__item" data-country="${entry.country}" data-year="${entry.year}">
+        ${escapeHtml(formatHistoryLabel(entry))}
+      </button>
+    `;
+  }).join("");
+}
+
+function addSearchHistoryItem(country, year) {
+  const normalizedYear = String(year).trim();
+  const history = getSearchHistory().filter((entry) => {
+    return entry.country !== country || entry.year !== normalizedYear;
+  });
+
+  history.unshift({ country, year: normalizedYear });
+  saveSearchHistory(history.slice(0, MAX_SEARCH_HISTORY_ITEMS));
+  renderSearchHistory();
+}
+
+function clearSearchHistory() {
+  saveSearchHistory([]);
+  renderSearchHistory();
+}
+
+function searchHolidays(country, year) {
+  addSearchHistoryItem(country, year);
+  fetchHolidays(country, year);
+}
 
 // -------------------------------------------------------------
 // UI STATE HELPERS
@@ -226,5 +296,26 @@ searchForm.addEventListener("submit", (event) => {
     return;
   }
 
-  fetchHolidays(country, year);
+  searchHolidays(country, year);
 });
+
+searchHistoryList.addEventListener("click", (event) => {
+  const historyButton = event.target.closest(".search-history__item");
+
+  if (!historyButton) {
+    return;
+  }
+
+  const country = historyButton.dataset.country;
+  const year = historyButton.dataset.year;
+
+  countrySelect.value = country;
+  yearInput.value = year;
+  searchHolidays(country, year);
+});
+
+clearHistoryBtn.addEventListener("click", () => {
+  clearSearchHistory();
+});
+
+renderSearchHistory();
