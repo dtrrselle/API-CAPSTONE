@@ -37,6 +37,7 @@ const COUNTRY_NAMES = {
 
 // Grab references to the DOM elements
 const countrySelect = document.getElementById("countrySelect");
+const yearInput = document.getElementById("yearInput"); // Dynamic Dropdown Reference (2020 - 2065)
 const showHolidaysBtn = document.getElementById("showHolidaysBtn");
 const loadingBox = document.getElementById("loadingBox");
 const errorBox = document.getElementById("errorBox");
@@ -45,32 +46,24 @@ const emptyBox = document.getElementById("emptyBox");
 const holidayGrid = document.getElementById("holidayGrid");
 
 function resetStatusBoxes() {
-  loadingBox.classList.remove("visible");
-  errorBox.classList.remove("visible");
-  emptyBox.classList.remove("visible");
-  holidayGrid.innerHTML = "";
+  if (loadingBox) loadingBox.classList.remove("visible");
+  if (errorBox) errorBox.classList.remove("visible");
+  if (emptyBox) emptyBox.classList.remove("visible");
+  if (holidayGrid) holidayGrid.innerHTML = "";
 }
 
 async function fetchHolidays(countryCode, year) {
-  const url =
-    `${API_BASE_URL}?api_key=${API_KEY}&country=${countryCode}&year=${year}`;
+  const url = `${API_BASE_URL}?api_key=${API_KEY}&country=${countryCode}&year=${year}`;
 
   const response = await fetch(url);
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      `Unable to retrieve holidays (${response.status})`
-    );
+    throw new Error(`Unable to retrieve holidays (${response.status})`);
   }
 
-  if (
-    !data.response ||
-    !Array.isArray(data.response.holidays)
-  ) {
-    throw new Error(
-      "Unexpected response format from Calendarific."
-    );
+  if (!data.response || !Array.isArray(data.response.holidays)) {
+    throw new Error("Unexpected response format from Calendarific.");
   }
 
   return data.response.holidays;
@@ -80,8 +73,7 @@ function normalizeHoliday(holiday, countryCode) {
   return {
     name: holiday.name,
 
-    // Calendarific format:
-    // holiday.date.iso
+    // Calendarific format: holiday.date.iso
     date: new Date(holiday.date.iso),
 
     country: COUNTRY_NAMES[countryCode] || countryCode,
@@ -126,68 +118,56 @@ function renderHolidays(holidays) {
 }
 
 async function handleShowHolidays() {
-  const countryCode = countrySelect.value;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const countryCode = countrySelect ? countrySelect.value : "PH";
+  
+  // Kung may Year Selector sa HTML, gagamitin ito (2020 - 2065).
+  // Kung wala, gagamitin ang kasalukuyang taon.
+  const selectedYear = yearInput ? parseInt(yearInput.value, 10) : new Date().getFullYear();
 
   resetStatusBoxes();
 
-  loadingBox.classList.add("visible");
-  showHolidaysBtn.disabled = true;
+  if (loadingBox) loadingBox.classList.add("visible");
+  if (showHolidaysBtn) showHolidaysBtn.disabled = true;
 
   try {
-    const currentYear = today.getFullYear();
+    // Kunin ang mga bakasyon batay sa napiling taon
+    const rawHolidays = await fetchHolidays(countryCode, selectedYear);
 
-    const [thisYearHolidays, nextYearHolidays] =
-      await Promise.all([
-        fetchHolidays(countryCode, currentYear),
-        fetchHolidays(countryCode, currentYear + 1),
-      ]);
-
-    const combined = [
-      ...thisYearHolidays,
-      ...nextYearHolidays,
-    ].map((holiday) =>
+    const formattedHolidays = rawHolidays.map((holiday) =>
       normalizeHoliday(holiday, countryCode)
     );
 
-    const upcoming = combined.filter(
-      (holiday) => holiday.date >= today
-    );
+    // I-sort batay sa petsa (mula sa pinakamaaga hanggang sa pinakahuli)
+    formattedHolidays.sort((a, b) => a.date - b.date);
 
-    upcoming.sort((a, b) => a.date - b.date);
+    if (loadingBox) loadingBox.classList.remove("visible");
+    if (showHolidaysBtn) showHolidaysBtn.disabled = false;
 
-    loadingBox.classList.remove("visible");
-    showHolidaysBtn.disabled = false;
-
-    if (upcoming.length === 0) {
-      emptyBox.classList.add("visible");
+    if (formattedHolidays.length === 0) {
+      if (emptyBox) emptyBox.classList.add("visible");
       return;
     }
 
-    renderHolidays(upcoming);
+    renderHolidays(formattedHolidays);
 
   } catch (error) {
-    loadingBox.classList.remove("visible");
-    showHolidaysBtn.disabled = false;
+    if (loadingBox) loadingBox.classList.remove("visible");
+    if (showHolidaysBtn) showHolidaysBtn.disabled = false;
 
-    errorText.textContent =
-      "We couldn't load holidays right now. " +
-      error.message;
+    if (errorText) {
+      errorText.textContent =
+        "We couldn't load holidays right now. " + error.message;
+    }
 
-    errorBox.classList.add("visible");
+    if (errorBox) errorBox.classList.add("visible");
 
     console.error(error);
   }
 }
 
-showHolidaysBtn.addEventListener(
-  "click",
-  handleShowHolidays
-);
+// Event Listeners
+if (showHolidaysBtn) {
+  showHolidaysBtn.addEventListener("click", handleShowHolidays);
+}
 
-window.addEventListener(
-  "DOMContentLoaded",
-  handleShowHolidays
-);
+window.addEventListener("DOMContentLoaded", handleShowHolidays);
