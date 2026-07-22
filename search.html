@@ -167,6 +167,83 @@
       overflow: hidden;
     }
 
+     main
+    .search-history {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #edf1f4;
+      display: grid;
+      gap: 12px;
+    }
+
+    .search-history__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-history__title {
+      margin: 0;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: #7c8894;
+    }
+
+    .search-history__clear {
+      border: none;
+      background: transparent;
+      color: var(--color-secondary);
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .search-history__clear:hover {
+      color: var(--color-primary);
+      text-decoration: underline;
+    }
+
+    .search-history__list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .search-history__item {
+      border: 1px solid #dfe7eb;
+      background: #f8fbf9;
+      color: var(--color-text);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform var(--transition), border-color var(--transition), background var(--transition);
+    }
+
+    .search-history__item:hover {
+      transform: translateY(-1px);
+      border-color: var(--color-secondary);
+      background: rgba(76, 175, 80, 0.08);
+    }
+
+    .search-history__empty {
+      margin: 0;
+      color: #7c8894;
+      font-size: 0.9rem;
+    }
+
+    /* Clean single-tone accent along the top of the search card —
+       a quiet nod to a calendar's top edge, without looking busy. */
+
+     main
     .search-card::before {
       content: "";
       position: absolute;
@@ -626,6 +703,16 @@
           <button type="submit" class="btn-primary" id="searchBtn">Find Holidays</button>
         </div>
       </form>
+
+      <section class="search-history" aria-labelledby="searchHistoryTitle">
+        <div class="search-history__header">
+          <h2 class="search-history__title" id="searchHistoryTitle">Recent searches</h2>
+          <button type="button" class="search-history__clear" id="clearHistoryBtn">Clear history</button>
+        </div>
+        <div class="search-history__list" id="searchHistoryList">
+          <p class="search-history__empty" id="searchHistoryEmpty">No recent searches yet.</p>
+        </div>
+      </section>
     </div>
   </section>
 

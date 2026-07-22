@@ -12,8 +12,6 @@
   <style>
     /* ============================================
        HOLIDAY EXPLORER - SHARED DESIGN TOKENS
-       These variables keep every page on the site
-       (navbar, footer, buttons, colors) consistent.
     ============================================ */
     :root {
       --color-primary: #2E8B57;   /* deep green - navbar / headings */
@@ -48,7 +46,7 @@
     ul { list-style: none; }
 
     /* ============================================
-       NAVBAR (shared across all Holiday Explorer pages)
+       NAVBAR
     ============================================ */
     .navbar {
       background-color: var(--color-primary);
@@ -103,7 +101,6 @@
       border-bottom: 2px solid var(--color-accent);
     }
 
-    /* Active link styled as a highlighted pill button (matches reference design) */
     .navbar__links a.active {
       background-color: var(--color-accent);
       color: var(--color-text);
@@ -113,12 +110,6 @@
       border-bottom: 2px solid transparent;
     }
 
-    .navbar__links a.active:hover {
-      border-bottom: 2px solid transparent;
-      opacity: 0.9;
-    }
-
-    /* Mobile nav toggle (simple checkbox hack, no JS needed for menu) */
     .navbar__toggle {
       display: none;
       color: var(--color-white);
@@ -174,8 +165,7 @@
     }
 
     /* ============================================
-       CONTROL PANEL (country select + button)
-       Styled like a calendar toolbar strip
+       CONTROL PANEL (country & year select + button)
     ============================================ */
     .control-panel {
       background-color: var(--color-white);
@@ -221,7 +211,6 @@
       border-color: var(--color-secondary);
     }
 
-    /* Shared button style used across the site */
     .btn-primary {
       font-family: 'Poppins', sans-serif;
       background-color: var(--color-secondary);
@@ -253,7 +242,7 @@
     }
 
     /* ============================================
-       STATUS AREA: loading / error / empty states
+       STATUS AREA
     ============================================ */
     .status-box {
       text-align: center;
@@ -261,14 +250,13 @@
       background-color: var(--color-white);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-soft);
-      display: none; /* shown dynamically by JS */
+      display: none;
     }
 
     .status-box.visible {
       display: block;
     }
 
-    /* Spinner - styled like a rotating calendar ring */
     .spinner {
       width: 44px;
       height: 44px;
@@ -293,12 +281,6 @@
       font-weight: 500;
     }
 
-    .status-icon {
-      font-size: 2.2rem;
-      margin-bottom: 10px;
-      display: block;
-    }
-
     /* ============================================
        HOLIDAY CARDS GRID
     ============================================ */
@@ -308,7 +290,6 @@
       gap: 22px;
     }
 
-    /* Each card mimics a calendar day tile */
     .holiday-card {
       background-color: var(--color-white);
       border-radius: var(--radius-lg);
@@ -376,7 +357,7 @@
     }
 
     /* ============================================
-       FOOTER (shared across all Holiday Explorer pages)
+       FOOTER
     ============================================ */
     .footer {
       background-color: var(--color-primary);
@@ -463,9 +444,7 @@
 </head>
 <body>
 
-  <!-- ============================================
-       NAVBAR
-  ============================================ -->
+  <!-- NAVBAR -->
   <nav class="navbar">
     <a href="index.html" class="navbar__brand">
       <span class="navbar__brand-icon">
@@ -486,26 +465,21 @@
     </ul>
   </nav>
 
-  <!-- ============================================
-       PAGE HEADER
-  ============================================ -->
-  <header class="page-header">
-    <span class="page-header__eyebrow">Plan ahead</span>
+  <!-- PAGE HEADER -->
+  <section class="page-header">
+    <span class="page-header__eyebrow">Explore Dates</span>
     <h1>Upcoming Holidays</h1>
-    <p>Pick a country and see its nearest holidays, sorted from soonest to latest.</p>
-  </header>
+    <p>Select a country and year to explore all official holidays.</p>
+  </section>
 
-  <!-- ============================================
-       MAIN CONTENT
-  ============================================ -->
+  <!-- MAIN CONTENT -->
   <main>
-
-    <!-- Control panel: country selector + action button -->
-    <section class="control-panel">
+    <div class="control-panel">
+      <!-- Country Selector -->
       <div class="control-group">
-        <label for="countrySelect">Country</label>
+        <label for="countrySelect">Select Country</label>
         <select id="countrySelect">
-          <option value="PH">Philippines</option>
+          <option value="PH" selected>Philippines</option>
           <option value="US">United States</option>
           <option value="JP">Japan</option>
           <option value="AU">Australia</option>
@@ -529,52 +503,93 @@
           <option value="AE">United Arab Emirates</option>
         </select>
       </div>
-      <button class="btn-primary" id="showHolidaysBtn">Show Upcoming Holidays</button>
-    </section>
 
-    <!-- Loading indicator (hidden by default, shown via JS) -->
+      <!-- Year Selector (2020 - 2065) -->
+      <div class="control-group">
+        <label for="yearInput">Select Year</label>
+        <select id="yearInput">
+          <option value="2020">2020</option>
+          <option value="2021">2021</option>
+          <option value="2022">2022</option>
+          <option value="2023">2023</option>
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+          <option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+          <option value="2029">2029</option>
+          <option value="2030">2030</option>
+          <option value="2031">2031</option>
+          <option value="2032">2032</option>
+          <option value="2033">2033</option>
+          <option value="2034">2034</option>
+          <option value="2035">2035</option>
+          <option value="2036">2036</option>
+          <option value="2037">2037</option>
+          <option value="2038">2038</option>
+          <option value="2039">2039</option>
+          <option value="2040">2040</option>
+          <option value="2041">2041</option>
+          <option value="2042">2042</option>
+          <option value="2043">2043</option>
+          <option value="2044">2044</option>
+          <option value="2045">2045</option>
+          <option value="2046">2046</option>
+          <option value="2047">2047</option>
+          <option value="2048">2048</option>
+          <option value="2049">2049</option>
+          <option value="2050">2050</option>
+          <option value="2051">2051</option>
+          <option value="2052">2052</option>
+          <option value="2053">2053</option>
+          <option value="2054">2054</option>
+          <option value="2055">2055</option>
+          <option value="2056">2056</option>
+          <option value="2057">2057</option>
+          <option value="2058">2058</option>
+          <option value="2059">2059</option>
+          <option value="2060">2060</option>
+          <option value="2061">2061</option>
+          <option value="2062">2062</option>
+          <option value="2063">2063</option>
+          <option value="2064">2064</option>
+          <option value="2065">2065</option>
+        </select>
+      </div>
+
+      <button class="btn-primary" id="showHolidaysBtn">Show Holidays</button>
+    </div>
+
+    <!-- Loading Box -->
     <div class="status-box" id="loadingBox">
       <div class="spinner"></div>
-      <p>Fetching holidays...</p>
+      <p>Loading holidays, please wait...</p>
     </div>
 
-    <!-- Error message (hidden by default, shown via JS on fetch failure) -->
+    <!-- Error Box -->
     <div class="status-box error" id="errorBox">
-      <span class="status-icon">⚠️</span>
-      <p id="errorText">Something went wrong while fetching holidays.</p>
+      <p id="errorText">Something went wrong.</p>
     </div>
 
-    <!-- Empty state (hidden by default, shown via JS when no holidays found) -->
+    <!-- Empty Box -->
     <div class="status-box" id="emptyBox">
-      <span class="status-icon">📭</span>
-      <p>No upcoming holidays found for this country.</p>
+      <p>No upcoming holidays found for this selection.</p>
     </div>
 
-    <!-- Holiday cards render here -->
-    <section class="holiday-grid" id="holidayGrid"></section>
-
+    <!-- Cards Grid -->
+    <div class="holiday-grid" id="holidayGrid"></div>
   </main>
 
-  <!-- ============================================
-       FOOTER
-  ============================================ -->
+  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer__links">
       <a href="index.html">Home</a>
+      <a href="search.html">Search Holidays</a>
       <a href="upcoming.html">Upcoming Holidays</a>
-      <a href="about.html">About</a>
     </div>
-    <p class="footer__copy">&copy; 2026 Holiday Explorer. All rights reserved.</p>
+    <div class="footer__copy">&copy; 2026 Holiday Explorer. All rights reserved.</div>
   </footer>
 
-  <!-- Mobile nav toggle script -->
-  <script>
-    document.getElementById('navToggle').addEventListener('click', function () {
-      document.getElementById('navLinks').classList.toggle('open');
-    });
-  </script>
-
-  <!-- Main page logic -->
   <script src="upcoming.js"></script>
 </body>
 </html>

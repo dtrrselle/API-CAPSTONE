@@ -493,3 +493,133 @@ footer {
         align-items: center;
     }
 }
+/* ======================================
+   WORLD FLAGS
+====================================== */
+
+.flags-section{
+
+    background:white;
+
+    padding:60px 0;
+
+    overflow:hidden;
+
+}
+
+.flags-header{
+
+    text-align:center;
+
+    margin-bottom:35px;
+
+}
+
+.flags-header h2{
+
+    color:var(--color-primary);
+
+    font-size:2rem;
+
+    margin-bottom:10px;
+
+}
+
+.flags-header p{
+
+    color:#666;
+
+}
+
+.flags-slider{
+
+    overflow:hidden;
+
+    position:relative;
+
+}
+
+.flags-slider::before,
+.flags-slider::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    width:120px;
+
+    height:100%;
+
+    z-index:2;
+
+}
+
+.flags-slider::before{
+
+    left:0;
+
+    background:linear-gradient(to right,#fff,transparent);
+
+}
+
+.flags-slider::after{
+
+    right:0;
+
+    background:linear-gradient(to left,#fff,transparent);
+
+}
+
+.flags-track{
+
+    display:flex;
+
+    align-items:center;
+
+    width:max-content;
+
+    animation:scrollFlags 28s linear infinite;
+
+}
+
+.flags-track img{
+
+    width:90px;
+
+    height:60px;
+
+    object-fit:cover;
+
+    margin:0 18px;
+
+    border-radius:10px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.12);
+
+    transition:.3s;
+
+}
+
+.flags-track img:hover{
+
+    transform:translateY(-8px) scale(1.08);
+
+}
+
+@keyframes scrollFlags{
+
+    from{
+
+        transform:translateX(0);
+
+    }
+
+    to{
+
+        transform:translateX(-50%);
+
+    }
+
+}
