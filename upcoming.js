@@ -1,210 +1,168 @@
-/* ==================================================================
-   HOLIDAY EXPLORER - Upcoming Holidays Page Logic
-   Uses the Calendarific Holiday API via Fetch + async/await.
-   ================================================================== */
+// upcoming.js
+// Powers upcoming.html: fetches public holidays for a selected country/year
+// from the free Nager.Date API and renders them as cards.
 
-// Store the API key in a variable
-const API_KEY = "XbTBRS861tYOs5Cze6VraZI62wfbo2zD";
+(function () {
+  const countrySelect = document.getElementById('countrySelect');
+  const yearInput = document.getElementById('yearInput');
+  const showHolidaysBtn = document.getElementById('showHolidaysBtn');
 
-// Base endpoint for the Calendarific API
-const API_BASE_URL = "https://calendarific.com/api/v2/holidays";
+  const loadingBox = document.getElementById('loadingBox');
+  const errorBox = document.getElementById('errorBox');
+  const errorText = document.getElementById('errorText');
+  const emptyBox = document.getElementById('emptyBox');
+  const holidayGrid = document.getElementById('holidayGrid');
 
-// Map ng Bansa, Pangalan, Lenggwahe (Language Code), at Bati sa Sariling Lenggwahe
-const COUNTRY_CONFIG = {
-  PH: { name: "Philippines", lang: "tl-PH", greeting: "Magandang araw, Mabuhay!" },
-  US: { name: "United States", lang: "en-US", greeting: "Good day, Welcome!" },
-  JP: { name: "Japan", lang: "ja-JP", greeting: "Konnichiwa, Yokoso!" },
-  AU: { name: "Australia", lang: "en-AU", greeting: "G'day, Welcome!" },
-  CA: { name: "Canada", lang: "en-CA", greeting: "Hello, Welcome!" },
-  GB: { name: "United Kingdom", lang: "en-GB", greeting: "Good day, Welcome!" },
-  SG: { name: "Singapore", lang: "en-SG", greeting: "Welcome!" },
-  MY: { name: "Malaysia", lang: "ms-MY", greeting: "Selamat datang!" },
-  ID: { name: "Indonesia", lang: "id-ID", greeting: "Selamat siang, Selamat datang!" },
-  TH: { name: "Thailand", lang: "th-TH", greeting: "Sawatdee, Yindee tonrab!" },
-  VN: { name: "Vietnam", lang: "vi-VN", greeting: "Xin chao, Chao mung!" },
-  KR: { name: "South Korea", lang: "ko-KR", greeting: "Annyeonghaseyo, Hwan-yeong-hamnida!" },
-  CN: { name: "China", lang: "zh-CN", greeting: "Nǐ hǎo, Huānyíng!" },
-  IN: { name: "India", lang: "hi-IN", greeting: "Namaste, Aapka swagat hai!" },
-  DE: { name: "Germany", lang: "de-DE", greeting: "Guten Tag, Willkommen!" },
-  FR: { name: "France", lang: "fr-FR", greeting: "Bonjour, Bienvenue!" },
-  IT: { name: "Italy", lang: "it-IT", greeting: "Buongiorno, Benvenuto!" },
-  ES: { name: "Spain", lang: "es-ES", greeting: "¡Buenos días, Bienvenido!" },
-  MX: { name: "Mexico", lang: "es-MX", greeting: "¡Buenos días, Bienvenido!" },
-  BR: { name: "Brazil", lang: "pt-BR", greeting: "Bom dia, Seja bem-vindo!" },
-  NZ: { name: "New Zealand", lang: "en-NZ", greeting: "Kia Ora, Welcome!" },
-  AE: { name: "United Arab Emirates", lang: "ar-AE", greeting: "Marhaban, Ahlan wa sahlan!" },
-};
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
 
-// Grab references to the DOM elements
-const countrySelect = document.getElementById("countrySelect");
-const yearInput = document.getElementById("yearInput");
-const showHolidaysBtn = document.getElementById("showHolidaysBtn");
-const loadingBox = document.getElementById("loadingBox");
-const errorBox = document.getElementById("errorBox");
-const errorText = document.getElementById("errorText");
-const emptyBox = document.getElementById("emptyBox");
-const holidayGrid = document.getElementById("holidayGrid");
+  const API_BASE = 'https://date.nager.at/api/v3/PublicHolidays';
 
-/* ==================================================================
-   TEXT-TO-SPEECH (Magsasalita sa Sariling Lenggwahe ng Bansa)
-   ================================================================== */
-function speakGreeting(countryCode) {
-  if ('speechSynthesis' in window) {
-    // Siguraduhing hihinto ang nakaraang boses bago magsimula ang bago
-    window.speechSynthesis.cancel();
+  const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    // Kunin ang detalye ng bansa (default sa PH kung wala sa listahan)
-    const config = COUNTRY_CONFIG[countryCode] || COUNTRY_CONFIG["PH"];
+  // Mobile nav toggle
+  if (navToggle && navLinks) {
+    navToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+    });
+  }
 
-    const utterance = new SpeechSynthesisUtterance(config.greeting);
-    utterance.lang = config.lang; // I-set sa mismong lenggwahe ng bansa (hal. ja-JP, es-ES)
-    utterance.rate = 0.9;         // katamtamang bilis
-    utterance.pitch = 1;
+  function hideAllStatusBoxes() {
+    loadingBox.classList.remove('visible');
+    errorBox.classList.remove('visible');
+    emptyBox.classList.remove('visible');
+  }
 
-    // Subukang piliin ang tamang boses mula sa browser kung available
-    const voices = window.speechSynthesis.getVoices();
-    const matchingVoice = voices.find(voice => voice.lang.startsWith(config.lang.slice(0, 2)));
-    if (matchingVoice) {
-      utterance.voice = matchingVoice;
+  function showLoading() {
+    hideAllStatusBoxes();
+    holidayGrid.innerHTML = '';
+    loadingBox.classList.add('visible');
+  }
+
+  function showError(message) {
+    hideAllStatusBoxes();
+    errorText.textContent = message;
+    errorBox.classList.add('visible');
+  }
+
+  function showEmpty() {
+    hideAllStatusBoxes();
+    emptyBox.classList.add('visible');
+  }
+
+  function setButtonLoading(isLoading) {
+    showHolidaysBtn.disabled = isLoading;
+    showHolidaysBtn.textContent = isLoading ? 'Loading...' : 'Show Holidays';
+  }
+
+  function buildCard(holiday, countryName) {
+    // holiday.date is "YYYY-MM-DD"
+    const [yearStr, monthStr, dayStr] = holiday.date.split('-');
+    const dateObj = new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr));
+
+    const card = document.createElement('div');
+    card.className = 'holiday-card';
+
+    const dateEl = document.createElement('div');
+    dateEl.className = 'holiday-card__date';
+    dateEl.innerHTML = `
+      <span class="holiday-card__day">${dayStr}</span>
+      <span class="holiday-card__month-year">${MONTHS[dateObj.getMonth()]} ${yearStr}</span>
+    `;
+
+    const bodyEl = document.createElement('div');
+    bodyEl.className = 'holiday-card__body';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'holiday-card__name';
+    nameEl.textContent = holiday.localName && holiday.localName !== holiday.name
+      ? `${holiday.name} (${holiday.localName})`
+      : holiday.name;
+
+    const weekdayEl = document.createElement('div');
+    weekdayEl.className = 'holiday-card__weekday';
+    weekdayEl.textContent = WEEKDAYS[dateObj.getDay()];
+
+    const countryEl = document.createElement('div');
+    countryEl.className = 'holiday-card__country';
+    countryEl.textContent = countryName;
+
+    bodyEl.appendChild(nameEl);
+    bodyEl.appendChild(weekdayEl);
+    bodyEl.appendChild(countryEl);
+
+    card.appendChild(dateEl);
+    card.appendChild(bodyEl);
+
+    return card;
+  }
+
+  async function fetchHolidays(year, countryCode) {
+    const response = await fetch(`${API_BASE}/${year}/${countryCode}`);
+
+    if (response.status === 204) {
+      // API returns 204 No Content when there is no data for that combo
+      return [];
     }
 
-    window.speechSynthesis.speak(utterance);
-  }
-}
-
-function resetStatusBoxes() {
-  if (loadingBox) loadingBox.classList.remove("visible");
-  if (errorBox) errorBox.classList.remove("visible");
-  if (emptyBox) emptyBox.classList.remove("visible");
-  if (holidayGrid) holidayGrid.innerHTML = "";
-}
-
-async function fetchHolidays(countryCode, year) {
-  const url = `${API_BASE_URL}?api_key=${API_KEY}&country=${countryCode}&year=${year}`;
-
-  const response = await fetch(url);
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(`Unable to retrieve holidays (${response.status})`);
-  }
-
-  if (!data.response || !Array.isArray(data.response.holidays)) {
-    throw new Error("Unexpected response format from Calendarific.");
-  }
-
-  return data.response.holidays;
-}
-
-function normalizeHoliday(holiday, countryCode) {
-  const countryName = COUNTRY_CONFIG[countryCode] ? COUNTRY_CONFIG[countryCode].name : countryCode;
-  return {
-    name: holiday.name,
-    date: new Date(holiday.date.iso),
-    country: countryName,
-  };
-}
-
-function createHolidayCard(holiday) {
-  const card = document.createElement("article");
-  card.className = "holiday-card";
-
-  const day = holiday.date.getDate();
-  const month = holiday.date.toLocaleString("en-US", { month: "short" });
-  const year = holiday.date.getFullYear();
-  const weekday = holiday.date.toLocaleString("en-US", { weekday: "long" });
-
-  card.innerHTML = `
-    <div class="holiday-card__date">
-      <span class="holiday-card__day">${day}</span>
-      <span class="holiday-card__month-year">${month} ${year}</span>
-    </div>
-
-    <div class="holiday-card__body">
-      <h3 class="holiday-card__name">${holiday.name}</h3>
-      <span class="holiday-card__weekday">${weekday}</span>
-      <span class="holiday-card__country">${holiday.country}</span>
-    </div>
-  `;
-
-  return card;
-}
-
-function renderHolidays(holidays) {
-  holidayGrid.innerHTML = "";
-
-  holidays.forEach((holiday) => {
-    holidayGrid.appendChild(createHolidayCard(holiday));
-  });
-}
-
-async function handleShowHolidays(isUserAction = false) {
-  const countryCode = countrySelect ? countrySelect.value : "PH";
-  const selectedYear = yearInput ? parseInt(yearInput.value, 10) : new Date().getFullYear();
-
-  // Magsasalita lamang sa sariling lenggwahe kapag nag-click o nagpalit ng bansa ang user
-  if (isUserAction) {
-    speakGreeting(countryCode);
-  }
-
-  resetStatusBoxes();
-
-  if (loadingBox) loadingBox.classList.add("visible");
-  if (showHolidaysBtn) showHolidaysBtn.disabled = true;
-
-  try {
-    const rawHolidays = await fetchHolidays(countryCode, selectedYear);
-
-    const formattedHolidays = rawHolidays.map((holiday) =>
-      normalizeHoliday(holiday, countryCode)
-    );
-
-    formattedHolidays.sort((a, b) => a.date - b.date);
-
-    if (loadingBox) loadingBox.classList.remove("visible");
-    if (showHolidaysBtn) showHolidaysBtn.disabled = false;
-
-    if (formattedHolidays.length === 0) {
-      if (emptyBox) emptyBox.classList.add("visible");
-      return;
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
     }
 
-    renderHolidays(formattedHolidays);
-
-  } catch (error) {
-    if (loadingBox) loadingBox.classList.remove("visible");
-    if (showHolidaysBtn) showHolidaysBtn.disabled = false;
-
-    if (errorText) {
-      errorText.textContent = "We couldn't load holidays right now. " + error.message;
-    }
-
-    if (errorBox) errorBox.classList.add("visible");
-
-    console.error(error);
+    return response.json();
   }
-}
 
-// Ensure voices are pre-loaded by browser
-if ('speechSynthesis' in window) {
-  window.speechSynthesis.onvoiceschanged = () => {
-    window.speechSynthesis.getVoices();
-  };
-}
+  async function handleShowHolidays() {
+    const countryCode = countrySelect.value;
+    const countryName = countrySelect.options[countrySelect.selectedIndex].text;
+    const year = yearInput.value;
 
-// Event Listeners
-if (countrySelect) {
-  countrySelect.addEventListener("change", () => {
-    speakGreeting(countrySelect.value);
-  });
-}
+    setButtonLoading(true);
+    showLoading();
 
-if (showHolidaysBtn) {
-  showHolidaysBtn.addEventListener("click", () => {
-    handleShowHolidays(true);
-  });
-}
+    try {
+      const holidays = await fetchHolidays(year, countryCode);
 
-window.addEventListener("DOMContentLoaded", () => {
-  handleShowHolidays(false); // Normal load nang walang audio restriction issue
-});
+      // Only keep holidays today or later when browsing the current year,
+      // so the page genuinely shows "upcoming" holidays.
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const currentYear = today.getFullYear();
+
+      let filtered = holidays;
+      if (Number(year) === currentYear) {
+        filtered = holidays.filter((h) => {
+          const [y, m, d] = h.date.split('-').map(Number);
+          const hDate = new Date(y, m - 1, d);
+          return hDate >= today;
+        });
+      }
+
+      // Sort chronologically
+      filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      hideAllStatusBoxes();
+
+      if (!filtered.length) {
+        showEmpty();
+        return;
+      }
+
+      holidayGrid.innerHTML = '';
+      filtered.forEach((holiday) => {
+        holidayGrid.appendChild(buildCard(holiday, countryName));
+      });
+    } catch (err) {
+      console.error('Failed to load holidays:', err);
+      showError('Unable to load holidays right now. Please check your connection and try again.');
+    } finally {
+      setButtonLoading(false);
+    }
+  }
+
+  showHolidaysBtn.addEventListener('click', handleShowHolidays);
+
+  // Load holidays automatically on first page load using the default selections
+  document.addEventListener('DOMContentLoaded', handleShowHolidays);
+})();
